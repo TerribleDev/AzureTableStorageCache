@@ -1,0 +1,17 @@
+﻿@model string
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="jumbotron">
+    @if(string.IsNullOrWhiteSpace(Model))
+    {
+        <span>No data found</span>
+        <a asp-action="AddCache" class="btn btn-primary">Add Item To Cache</a>
+
+    }
+    else
+    {
+        <span>Cached Data: @Model</span>
+    }
+</div>
