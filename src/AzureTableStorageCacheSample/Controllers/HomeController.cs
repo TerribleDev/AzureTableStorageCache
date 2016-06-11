@@ -1,39 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
-using Microsoft.Framework.Caching.Distributed;
+using Microsoft.AspNetCore.Mvc;
 
-namespace AzureTableStorageCache.Sample.Controllers
+namespace AzureTableStorageCacheSample.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IDistributedCache cacheMechanism;
-
-        public HomeController(IDistributedCache cacheMechanism)
+        public IActionResult Index()
         {
-            this.cacheMechanism = cacheMechanism;
-        }
-        public async Task<IActionResult> Index()
-        {
-            var data = await cacheMechanism.GetAsync("awesomeRecord");
-            var result = string.Empty;
-            if(data != null)
-            {
-                result = Encoding.UTF32.GetString(data);
-            }
-            return View(result);
-
+            return View();
         }
 
-        public async Task<IActionResult> AddCache()
+        public IActionResult About()
         {
-            cacheMechanism.SetAsync("awesomeRecord", Encoding.UTF32.GetBytes("Im Awesome"));
             ViewData["Message"] = "Your application description page.";
 
-            return RedirectToAction("Index");
+            return View();
         }
 
         public IActionResult Contact()
@@ -45,7 +29,7 @@ namespace AzureTableStorageCache.Sample.Controllers
 
         public IActionResult Error()
         {
-            return View("~/Views/Shared/Error.cshtml");
+            return View();
         }
     }
 }

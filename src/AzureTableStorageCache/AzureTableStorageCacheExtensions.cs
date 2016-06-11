@@ -1,12 +1,12 @@
-﻿using System;
+﻿using AzureTableStorageCache;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Framework.Caching.Distributed;
-using Microsoft.Framework.DependencyInjection;
-using AzureTableStorageCache;
 
-namespace Microsoft.AspNet.Builder
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class AzureTableStorageCacheExtensions
     {
@@ -20,20 +20,16 @@ namespace Microsoft.AspNet.Builder
         /// <returns></returns>
         public static IServiceCollection AddAzureTableStorageCache(this IServiceCollection services, string connectionString, string tableName, string partitionKey)
         {
-            if(string.IsNullOrWhiteSpace(connectionString))
+            if (string.IsNullOrWhiteSpace(connectionString))
             {
                 throw new ArgumentNullException("connectionString must not be null");
             }
-            if(services == null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
-
 
             //services.AddSingleton<Azure>
-            services.Add(ServiceDescriptor.Singleton<IDistributedCache, AzureTableStorageCacheHandler>(a=> new AzureTableStorageCacheHandler(connectionString, tableName, partitionKey)));
+            services.Add(ServiceDescriptor.Singleton<IDistributedCache, AzureTableStorageCacheHandler>(a => new AzureTableStorageCacheHandler(connectionString, tableName, partitionKey)));
             return services;
         }
+
         /// <summary>
         /// Add azure table storage cache as an IDistributedCache to the service container
         /// </summary>
@@ -45,17 +41,13 @@ namespace Microsoft.AspNet.Builder
         /// <returns></returns>
         public static IServiceCollection AddAzureTableStorageCache(this IServiceCollection services, string accountName, string accountKey, string tableName, string partitionKey)
         {
-            if(string.IsNullOrWhiteSpace(accountName))
+            if (string.IsNullOrWhiteSpace(accountName))
             {
                 throw new ArgumentNullException("accountName must not be null");
             }
-            if(string.IsNullOrWhiteSpace(accountKey))
+            if (string.IsNullOrWhiteSpace(accountKey))
             {
                 throw new ArgumentNullException("accountKey must not be null");
-            }
-            if(services == null)
-            {
-                throw new ArgumentNullException(nameof(services));
             }
 
             //services.AddSingleton<Azure>
@@ -63,18 +55,17 @@ namespace Microsoft.AspNet.Builder
             new AzureTableStorageCacheHandler(accountName, accountKey, tableName, partitionKey)));
             return services;
         }
+
         private static void checkTableData(string tableName, string partitionkey)
         {
-            if(string.IsNullOrWhiteSpace(tableName))
+            if (string.IsNullOrWhiteSpace(tableName))
             {
                 throw new ArgumentNullException("tableName must not be null");
             }
-            if(string.IsNullOrWhiteSpace(partitionkey))
+            if (string.IsNullOrWhiteSpace(partitionkey))
             {
                 throw new ArgumentNullException("partitionkey must not be null");
             }
         }
-
-
     }
 }
