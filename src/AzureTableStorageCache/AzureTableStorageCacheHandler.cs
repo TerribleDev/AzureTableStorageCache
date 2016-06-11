@@ -34,7 +34,6 @@ namespace AzureTableStorageCache
             }
             this.tableName = tableName;
             this.partitionKey = partitionKey;
-            Connect();
         }
 
         public AzureTableStorageCacheHandler(string accountName, string accountKey, string tableName, string partitionKey)
@@ -51,6 +50,7 @@ namespace AzureTableStorageCache
 
             this.accountName = accountName;
             this.accountKey = accountKey;
+            Connect();
         }
 
         private readonly string tableName;
@@ -64,6 +64,7 @@ namespace AzureTableStorageCache
             }
 
             this.connectionString = connectionString;
+            Connect();
         }
 
         public void Connect()
@@ -99,10 +100,13 @@ namespace AzureTableStorageCache
 
         public async Task<byte[]> GetAsync(string key)
         {
-            await RefreshAsync(key);
-            var op = TableOperation.Retrieve(partitionKey, key);
-            var result = await azuretable.ExecuteAsync(op);
-            return (result?.Result as CachedItem)?.Data;
+            var cachedItem = await RetrieveAsync(key);
+            if (cachedItem != null && cachedItem.Data != null && ShouldDelete(cachedItem))
+            {
+                await RemoveAsync(key);
+                return null;
+            }
+            return cachedItem?.Data;
         }
 
         public void Refresh(string key)
@@ -112,9 +116,7 @@ namespace AzureTableStorageCache
 
         public async Task RefreshAsync(string key)
         {
-            var op = TableOperation.Retrieve(partitionKey, key);
-            var result = await azuretable.ExecuteAsync(op);
-            var data = result?.Result as CachedItem;
+            var data = await RetrieveAsync(key);
             if (data != null)
             {
                 if (ShouldDelete(data))
@@ -123,6 +125,14 @@ namespace AzureTableStorageCache
                     return;
                 }
             }
+        }
+
+        private async Task<CachedItem> RetrieveAsync(string key)
+        {
+            var op = TableOperation.Retrieve<CachedItem>(partitionKey, key);
+            var result = await azuretable.ExecuteAsync(op);
+            var data = result?.Result as CachedItem;
+            return data;
         }
 
         private bool ShouldDelete(CachedItem data)
@@ -176,6 +186,14 @@ namespace AzureTableStorageCache
                 absoluteExpiration = options.AbsoluteExpiration;
             }
             var item = new CachedItem(partitionKey, key, value) { LastAccessTime = currentTime };
+            if (absoluteExpiration.HasValue)
+            {
+                item.AbsolutExperiation = absoluteExpiration;
+            }
+            if (options.SlidingExpiration.HasValue)
+            {
+                item.SlidingExperiation = options.SlidingExpiration;
+            }
             var op = TableOperation.InsertOrReplace(item);
             return this.azuretable.ExecuteAsync(op);
         }

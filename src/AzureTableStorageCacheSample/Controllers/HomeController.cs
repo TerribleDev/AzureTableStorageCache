@@ -19,11 +19,15 @@ namespace AzureTableStorageCacheSample.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var data = await cacheMechanism.GetAsync("awesomeRecord");
+            await cacheMechanism.SetAsync("awesomeRecord2", Encoding.UTF32.GetBytes("records are awesome"), new DistributedCacheEntryOptions() { SlidingExpiration = new TimeSpan(0, 5, 0) });
+            var data = await cacheMechanism.GetAsync("awesomeRecord2");
             var result = string.Empty;
             if (data != null)
             {
                 result = Encoding.UTF32.GetString(data);
+            }
+            else
+            {
             }
             return View(result);
         }
