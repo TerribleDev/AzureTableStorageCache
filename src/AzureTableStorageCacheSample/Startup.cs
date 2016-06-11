@@ -29,7 +29,7 @@ namespace AzureTableStorageCacheSample
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAzureTableStorageCache("DefaultEndpointsProtocol=https;AccountName=tparnell;AccountKey=cEHdbvM6bljcIYOaODs16vRokLDvxujEn+JR/8MWgYE/9g4mw95n/jusTAdvhc/JrySfZGwaq/WIg9Bi/TeoOw==", "yodawg", "cachingforlyfe");
+            services.AddAzureTableStorageCache("connectionstring", "table", "partitionKey");
             // Add framework services.
             services.AddMvc();
         }
