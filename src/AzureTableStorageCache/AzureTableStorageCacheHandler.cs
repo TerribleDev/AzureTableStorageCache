@@ -99,6 +99,7 @@ namespace AzureTableStorageCache
 
         public async Task<byte[]> GetAsync(string key)
         {
+            await RefreshAsync(key);
             var op = TableOperation.Retrieve(partitionKey, key);
             var result = await azuretable.ExecuteAsync(op);
             return (result?.Result as CachedItem)?.Data;
@@ -131,7 +132,7 @@ namespace AzureTableStorageCache
             {
                 return true;
             }
-            if (data.SlidingExperiation.HasValue && data.LastAccessTime.HasValue && data.LastAccessTime <= currentTime.Add(data.SlidingExperiation.Value))
+            if (data.SlidingExperiation.HasValue && data.LastAccessTime.HasValue && data.LastAccessTime.Value.Add(data.SlidingExperiation.Value) < currentTime)
             {
                 return true;
             }
