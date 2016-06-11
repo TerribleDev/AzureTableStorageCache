@@ -48,7 +48,7 @@ public class HomeController : Controller
 
         public async Task<IActionResult> AddCache()
         {
-            cacheMechanism.SetAsync("awesomeRecord", Encoding.UTF32.GetBytes("Im Awesome"));
+            await cacheMechanism.SetAsync("awesomeRecord", Encoding.UTF32.GetBytes("Im Awesome"));
             ViewData["Message"] = "Your application description page.";
 
             return RedirectToAction("Index");
